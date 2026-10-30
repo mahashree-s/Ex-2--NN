@@ -1,8 +1,10 @@
-<H3>Name</H3>
-<H3>Register no.</H3>
-<H3>Date</H3>
+<H3>Name:MAHASHREE S</H3>
+<H3>Register no:212225230163</H3>
+<H3>Date:30-10-2026</H3>
 <H3>Experiment No. 2 </H3>
-## Implementation of Perceptron for Binary Classification
+
+Implementation of Perceptron for Binary Classification
+
 # AIM:
 To implement a perceptron for classification using Python<BR>
 
@@ -49,11 +51,107 @@ STEP 9:For ‘N ‘ iterations ,do the following:<BR>
 STEP 10:Plot the error for each iteration <BR>
 STEP 11:Print the accuracy<BR>
 # PROGRAM:
-    ''' Insert your code here '''
+```python
 
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+class Perceptron:
+    def __init__(self, learning_rate=0.01):
+        self.learning_rate = learning_rate
+        self._b = 0.0
+        self._w = None
+        self.misclassified_samples = []
+
+    def fit(self, x, y, n_iter=10):
+        self._b = 0.0
+        self._w = np.zeros(x.shape[1])
+        self.misclassified_samples = []
+
+        for _ in range(n_iter):
+            errors = 0
+            for xi, yi in zip(x, y):
+                update = self.learning_rate * (yi - self.predict(xi))
+                self._b += update
+                self._w += update * xi
+                errors += int(update != 0.0)
+            self.misclassified_samples.append(errors)
+
+    def f(self, x):
+        return np.dot(x, self._w) + self._b
+
+    def predict(self, x):
+        return np.where(self.f(x) >= 0, 1, -1)
+
+
+df = pd.read_csv("breast-cancer.csv")
+
+print(df.head())
+
+x3 = df[["radius_mean", "texture_mean", "perimeter_mean"]].values
+y = np.where(df["diagnosis"] == "B", 1, -1)
+
+fig = plt.figure()
+ax = plt.axes(projection="3d")
+ax.set_title("Breast Cancer Dataset")
+ax.set_xlabel("Radius Mean")
+ax.set_ylabel("Texture Mean")
+ax.set_zlabel("Perimeter Mean")
+
+ax.scatter(x3[y == 1, 0], x3[y == 1, 1], x3[y == 1, 2],
+           color="green", marker="o", s=8, label="Benign")
+ax.scatter(x3[y == -1, 0], x3[y == -1, 1], x3[y == -1, 2],
+           color="red", marker="x", s=8, label="Malignant")
+plt.legend()
+plt.show()
+
+x = df[["radius_mean", "texture_mean"]].values
+
+plt.figure(figsize=(4, 4))
+plt.scatter(x[y == 1, 0], x[y == 1, 1],
+            color="green", marker="o", label="Benign")
+plt.scatter(x[y == -1, 0], x[y == -1, 1],
+            color="red", marker="x", label="Malignant")
+plt.xlabel("Radius Mean")
+plt.ylabel("Texture Mean")
+plt.legend()
+plt.show()
+
+x[:, 0] = (x[:, 0] - x[:, 0].mean()) / x[:, 0].std()
+x[:, 1] = (x[:, 1] - x[:, 1].mean()) / x[:, 1].std()
+
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.25, random_state=0, stratify=y
+)
+
+classifier = Perceptron(learning_rate=0.01)
+classifier.fit(x_train, y_train, n_iter=10)
+
+print("Accuracy:", accuracy_score(classifier.predict(x_test), y_test) * 100)
+
+plt.figure(figsize=(4, 4))
+plt.plot(range(1, len(classifier.misclassified_samples) + 1),
+         classifier.misclassified_samples, marker="o")
+plt.xlabel("Epoch")
+plt.ylabel("Errors")
+plt.title("Perceptron Learning")
+plt.show()
+
+```
 # OUTPUT:
+<img width="787" height="755" alt="image" src="https://github.com/user-attachments/assets/60427d33-1eaf-45de-93be-a1e59cd4be77" />
 
-    ''' Show your result '''
+<img width="812" height="798" alt="image" src="https://github.com/user-attachments/assets/28dff250-d602-4b55-813f-21381b2ebd21" />
+
+<img width="836" height="778" alt="image" src="https://github.com/user-attachments/assets/2672d881-5595-4a69-90f4-62318adb28fc" />
+
+<img width="861" height="751" alt="image" src="https://github.com/user-attachments/assets/2f311f87-f94f-44a2-9178-4fc89aaa16ac" />
 
 # RESULT:
  Thus, a single layer perceptron model is implemented using python to classify Iris data set.
